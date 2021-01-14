@@ -11,9 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 
-@WebServlet(urlPatterns = "/product")
+@WebServlet(name = "ProductServlet", urlPatterns = "/product")
 public class ProductServlet extends HttpServlet {
 
     DAOFactory daoFactory;
@@ -21,8 +22,9 @@ public class ProductServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        final String databaseName = config.getServletContext().getInitParameter("database.name");
         try {
-            daoFactory = DAOFactory.getInstance(DatabaseName.MYSQL);
+            daoFactory = DAOFactory.getInstance(DatabaseName.valueOf(databaseName));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -31,14 +33,27 @@ public class ProductServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            String id = req.getParameter("id");
+            final List<ProductSpec> productSpecs;
+            ProductSpecDAO productSpecDAO = daoFactory.getProductSpecDao();
+            if (id == null) {
+                productSpecs = productSpecDAO.readAll();
+            } else {
+                ProductSpec productSpec =null;
+                try {
+                    productSpec = productSpecDAO.read(Integer.parseInt(id));
+                } catch (NumberFormatException e){
+                    e.printStackTrace();
+                }
+                productSpecs = productSpec != null ? List.of(productSpec) : Collections.emptyList();
+            }
+
             PrintWriter writer = resp.getWriter();
 
-            ProductSpecDAO productSpecDAO = daoFactory.getProductSpecDao();
-            final List<ProductSpec> productSpecs = productSpecDAO.readAll();
             for (ProductSpec productSpec : productSpecs) {
 
-                System.out.println("id="+productSpec.getId()+" name="+productSpec.getProductName()+" details="+productSpec.getProductDetails());
-                writer.println("id="+productSpec.getId()+" name="+productSpec.getProductName()+" details="+productSpec.getProductDetails());
+                System.out.println("id=" + productSpec.getId() + " name=" + productSpec.getProductName() + " details=" + productSpec.getProductDetails());
+                writer.println("id=" + productSpec.getId() + " name=" + productSpec.getProductName() + " details=" + productSpec.getProductDetails());
             }
 //            while (resultSet.next()){
 //

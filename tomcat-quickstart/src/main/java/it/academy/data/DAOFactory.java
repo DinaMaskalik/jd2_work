@@ -10,7 +10,6 @@ public class DAOFactory {
 
     public DAOFactory() throws ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
-
     }
 
     public ProductSpecDAO getProductSpecDao() throws SQLException {
