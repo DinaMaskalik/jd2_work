@@ -2,7 +2,7 @@ package it.academy.model;
 
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Id;// persistence - сохранение состтояния объекта
 import java.sql.Date;
 import java.util.Objects;
 
