@@ -1,80 +1,48 @@
 package it.academy.model;
 
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;// persistence - сохранение состтояния объекта
+import javax.persistence.*;
 import java.sql.Date;
-import java.util.Objects;
-
 
 @Entity
+@Table(name = "T_PERSON")
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class Person {
 
     @Id
-    private Long id;
+    @Column(name = "P_ID")
+    @GeneratedValue(generator = "uuid-generator")
+    @GenericGenerator(name = "uuid-generator", strategy = "uuid")
+    private String personId;
 
+    @Column(name = "P_NAME", length = 1000)
     private String name;
 
+    @Column(name = "P_SEC_NAME", length = 1000)
     private String secondName;
 
+    @Column(name = "P_BIRTH_DATE")
     private Date dateOfBirth;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    public Long getId() {
-        return id;
-    }
+    @ElementCollection
+    @OrderColumn(name = "C_ORDER")
+    private String[] comments;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToOne
+    @JoinColumn(name = "SHOP_USER_ID")
+    private ShopUser shopUser;
 
-    public String getName() {
-        return name;
-    }
+}
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return Objects.equals(id, person.id) &&
-                Objects.equals(name, person.name) &&
-                Objects.equals(secondName, person.secondName) &&
-                Objects.equals(dateOfBirth, person.dateOfBirth);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, secondName, dateOfBirth);
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", secondName='" + secondName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                '}';
-    }
+enum Status{
+    NEW, UPDATE, DELETE
 }

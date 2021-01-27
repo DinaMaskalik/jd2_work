@@ -24,8 +24,8 @@ public class PersonTest {
 
         StandardServiceRegistry registry =
                 new StandardServiceRegistryBuilder()
-                .configure("hibernate.cfg.test.xml")
-                .build();
+                        .configure("hibernate.cfg.test.xml")
+                        .build();
 
         sessionFactory =
                 new MetadataSources(registry)
@@ -35,43 +35,52 @@ public class PersonTest {
     }
 
     @Test
-    public void create(){
-        //Given
-        Person person= new Person();
-        person.setId(1L);
-        person.setName("Natalia");
-        person.setSecondName("Ivanova");
-        person.setDateOfBirth(Date.valueOf("1980-01-01"));
+        public void create() {
+            //Given
+            Person person = new Person();
+            person.setName("Natalia");
+            person.setSecondName("Ivanova");
+            person.setDateOfBirth(Date.valueOf("1980-01-01"));
+            person.setStatus(Status.NEW);
+            person.setComments(new String[]{"Comment1", "Comment2"});
 
-        //When
-        Session session = sessionFactory.openSession();
-        Transaction tx=null;
-        Serializable id =null;
-        try {
-            tx = session.beginTransaction();
-            //do some work
-            id = session.save(person);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        } finally {
-            session.close();
+            ShopUser shopUser= new ShopUser();
+            shopUser.setUserName("n_ivanova");
+            shopUser.setPassword("secret");
+
+            person.setShopUser(shopUser);
+
+            //When
+            Session session = sessionFactory.openSession();
+            Transaction tx = null;
+            Serializable id = null;
+            try {
+                tx = session.beginTransaction();
+                //do some work
+                id = session.save(person);
+                session.save(shopUser);
+
+                tx.commit();
+            } catch (Exception e) {
+                if (tx != null) tx.rollback();
+                throw e;
+            } finally {
+                session.close();
+            }
+
+            //Then
+            assertNotNull(id);
         }
 
-        //Then
-        assertNotNull(id);
-    }
-
     @Test
-    public void delete(){
+    public void delete() {
         //given
         Session session = sessionFactory.openSession();
-        Person person = session.get(Person.class, 1L);
+        Person person = session.get(Person.class, "4028abed773a6d4601773a6d48d30000");
 
         //When
-        Transaction tx=null;
-        Serializable id =null;
+        Transaction tx = null;
+        Serializable id = null;
         try {
             tx = session.beginTransaction();
             //do some work
@@ -83,7 +92,7 @@ public class PersonTest {
         }
 
         //Then
-        assertNull(session.get(Person.class, 1L));
+        assertNull(session.get(Person.class, "4028abed773a6d4601773a6d48d30000"));
 
         session.close();
     }

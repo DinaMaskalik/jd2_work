@@ -12,24 +12,22 @@ import java.sql.Date;
 
 public class Main {
     public static void main(String[] args) {
-
-        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .build();
-
-        SessionFactory sessionFactory =
+        StandardServiceRegistry registry =
+                new StandardServiceRegistryBuilder()
+                        .configure()
+                        .build();
+        SessionFactory factory =
                 new MetadataSources(registry)
-                .buildMetadata()
-                .buildSessionFactory();
+                        .buildMetadata()
+                        .buildSessionFactory();
 
-        Person person= new Person();
-        person.setId(1L);
+        Person person = new Person();
         person.setName("Natalia");
         person.setSecondName("Ivanova");
         person.setDateOfBirth(Date.valueOf("1980-01-01"));
 
-        Session session = sessionFactory.openSession();
-        Transaction tx=null;
+        Session session = factory.openSession();
+        Transaction tx = null;
         try {
             tx = session.beginTransaction();
             //do some work
@@ -41,5 +39,6 @@ public class Main {
         } finally {
             session.close();
         }
+
     }
 }
